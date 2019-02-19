@@ -1,0 +1,19 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "pntp-gp-ui-20190219072212-authRole",
+            "UnauthRoleArn": "arn:aws:iam::959720795291:role/pntp-gp-ui-20190219072212-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::959720795291:role/pntp-gp-ui-20190219072212-authRole",
+            "Region": "us-east-2",
+            "DeploymentBucketName": "pntp-gp-ui-20190219072212-deployment",
+            "UnauthRoleName": "pntp-gp-ui-20190219072212-unauthRole",
+            "StackName": "pntp-gp-ui-20190219072212",
+            "StackId": "arn:aws:cloudformation:us-east-2:959720795291:stack/pntp-gp-ui-20190219072212/fc8f6cc0-3440-11e9-b612-0a1513ed47e4"
+        },
+        "categories": {
+            "auth": {
+                "cognito7c280fe6": {}
+            }
+        }
+    }
+}
