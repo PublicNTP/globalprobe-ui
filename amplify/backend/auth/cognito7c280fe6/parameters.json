@@ -47,7 +47,6 @@
     "userpoolClientLogPolicy": "cognito7c280fe6_userpoolclient_lambda_log_policy",
     "userpoolClientLambdaPolicy": "cognito7c280fe6_userpoolclient_lambda_iam_policy",
     "userpoolClientSetAttributes": false,
-    "useDefault": "default",
     "resourceName": "cognito7c280fe6",
     "authSelections": "identityPoolAndUserPool",
     "authRoleName": {
@@ -67,5 +66,6 @@
             "UnauthRole",
             "Arn"
         ]
-    }
+    },
+    "useDefault": "manual"
 }
