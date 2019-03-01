@@ -5,9 +5,6 @@
         <!-- <div v-if="!profile"><h1>Im a public dashboard</h1></div>
         <div v-if="profile"><h1>Im an authenticated dashboard for {{profile.email}} </h1></div> -->
         </div>
-        <div v-if='!profile' class='display-4'>
-            Public dashboard
-        </div>
     </div>
     
 </template>
