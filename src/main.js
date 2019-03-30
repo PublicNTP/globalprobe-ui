@@ -28,6 +28,7 @@ import Authenticator from './components/AwsAuthenticator.vue'
 import ServerViewVue from './components/ServerView.vue'
 import ServerAddVue from './components/ServerAdd.vue'
 import ServerDeleteVue from './components/ServerDelete.vue'
+import ServerHistory from './components/ServerHistory.vue'
 
 
 const router = new VueRouter({
@@ -93,6 +94,15 @@ const router = new VueRouter({
         private: true
       }
     },
+    {
+      name: "View-server-history",
+      path: "/server/history/:serverUrl/:serverIpAddr",
+      component: ServerHistory,
+      props: true,
+      meta: {
+        private: true
+      }
+    }
 
 
     /*
