@@ -77,6 +77,7 @@ export default {
             num_secs: 86400,  // 24 hours
             //num_secs: 3600,  // 1 hours
             history: undefined,
+            statistics: undefined,
             isFetchingHistory: false,
             colorScheme: d3.scaleOrdinal(d3.schemeCategory10)
         }
@@ -107,6 +108,18 @@ export default {
                 {
                     key: "stddev",
                     label: "Std. Dev (ms)",
+                },
+                {
+                    key: "total",
+                    label: "Requests"
+                },
+                {
+                    key: "dropped",
+                    label: "Dropped"
+                },
+                {
+                    key: "reliability",
+                    label: "Reliability (%)"
                 }
               ]
         },
@@ -115,7 +128,10 @@ export default {
                 return {
                     probeSite: x,
                     mean: this.getAvgNtpOffsetMs(x).toFixed(2),
-                    stddev: this.getNtpOffsetDeviationMs(x).toFixed(2)
+                    stddev: this.getNtpOffsetDeviationMs(x).toFixed(2),
+                    total: this.statistics[x].total,
+                    dropped: this.statistics[x].dropped,
+                    reliability: (((this.statistics[x].total - this.statistics[x].dropped) / this.statistics[x].total) * 100).toFixed(0)
                 }
             })
         },
@@ -124,7 +140,10 @@ export default {
                 return {
                     probeSite: x,
                     mean: this.getAvgRespDelayMs(x).toFixed(2),
-                    stddev: this.getRespDelayDeviationMs(x).toFixed(2)
+                    stddev: this.getRespDelayDeviationMs(x).toFixed(2),
+                    total: this.statistics[x].total,
+                    dropped: this.statistics[x].dropped,
+                    reliability: (((this.statistics[x].total - this.statistics[x].dropped) / this.statistics[x].total) * 100).toFixed(0)
                 }
             })
         }
@@ -140,7 +159,9 @@ export default {
                     // The data should be seen as "from this probe site to this IP address"
                     // console.log('raw data')
                     // console.log(data)
-                    this.history = this.sanitizeHistoryData(data[this.serverUrl][this.serverIpAddr])
+                    let sanitized = this.sanitizeHistoryData(data[this.serverUrl][this.serverIpAddr])
+                    this.history = sanitized.history
+                    this.statistics = sanitized.statistics
                     this.isFetchingHistory = false
 
                     this.drawNtpOffsetPlot('ntp_offset')
@@ -154,17 +175,35 @@ export default {
         },
         sanitizeHistoryData: function (data) {
             var series = {}
+            var statistics = {
+                total: 0,
+                dropped: 0
+            }
             data.forEach(element => {
                 if (!series[element.probe_site]) {
                     series[element.probe_site] = []
+                    statistics[element.probe_site] = {
+                        total: 0,
+                        dropped: 0
+                    }
                 }
-                series[element.probe_site].push({
-                    time: Date.parse(element.response_received),
-                    ntp_offset: 1000.0 * element.local_remote_utc_offset_secs,
-                    latency: 1000.0 * element.round_trip_time_secs
-                })
+                statistics[element.probe_site].total += 1
+
+                let response_received = Date.parse(element.response_received)
+                if (!isNaN(response_received)) {
+                    series[element.probe_site].push({
+                        time: Date.parse(element.response_received),
+                        ntp_offset: 1000.0 * element.local_remote_utc_offset_secs,
+                        latency: 1000.0 * element.round_trip_time_secs
+                    })
+                } else {
+                  statistics[element.probe_site].dropped += 1
+                }
             });
-            return series
+            return {
+                history: series,
+                statistics: statistics
+            }
         },
         drawNtpOffsetPlot: function (fieldName) {
             let color = this.colorScheme
