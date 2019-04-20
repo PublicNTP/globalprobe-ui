@@ -13,7 +13,7 @@
                     <b-input-group>
                         <b-form-input v-model="addServerUrl" placeholder="NTP Server Hostname" />
                         <b-input-group-append>
-                            <b-button variant="primary" :disabled="!addServerUrl" :to="{name: 'Add-server', params: {serverUrl: addServerUrl}}">Add Server</b-button>
+                            <b-button variant="primary" :disabled="!addServerUrl" :to="{name: 'Add-server', params: {serverUrl: addServerUrl}}"><i class="fas fa-plus-square"></i>Add Server</b-button>
                         </b-input-group-append>
                     </b-input-group>
                 </b-form-group>
@@ -91,7 +91,11 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="css" scoped>
 
+i {
+  padding-right: 0.4em
+
+}
 
 </style>
