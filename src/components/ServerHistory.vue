@@ -117,17 +117,16 @@ export default {
         fetchHistory: function () {
             this.isFetchingHistory = true
             let resourceUrl = `/server/history/last_n_secs/${this.num_secs}/fqdn/${this.serverUrl}`
-            console.log(`Get history from ${resourceUrl}`)
+            //console.log(`Get history from ${resourceUrl}`)
             this.$Amplify.API.get("GlobalProbeAPI", resourceUrl)
                 .then((data) => {
                     // The data should be seen as "from this probe site to this IP address"
-                    console.log('raw data')
-                    console.log(data)
-                    console.log(data[this.serverUrl][this.serverIpAddr])
+                    // console.log('raw data')
+                    // console.log(data)
                     this.history = this.sanitizeHistoryData(data[this.serverUrl][this.serverIpAddr])
                     this.isFetchingHistory = false
 
-                    this.drawPlot('ntp_offset')
+                    this.drawNtpOffsetPlot('ntp_offset')
                     this.drawLatencyPlot()
                 })
                 .catch((err) => {
@@ -150,9 +149,9 @@ export default {
             });
             return series
         },
-        drawPlot: function (fieldName) {
+        drawNtpOffsetPlot: function (fieldName) {
             let color = this.colorScheme
-            console.log(`${fieldName}_plot`)
+
             var chart = d3.select(`#${fieldName}_plot`)
                 .append("svg:svg")
                 .attr("width", this.width + this.margin.right + this.margin.left)
@@ -177,19 +176,6 @@ export default {
             var xAxis = d3.axisBottom()
                 .scale(x)
 
-            main.append("g")
-                .attr("transform", "translate(0," + this.height + ")")
-                .attr("class", "main axis date")
-                .call(xAxis)
-
-            main.append("text")
-                .attr('transform', 'rotate(-90)')
-                .attr("x", -0.5 * this.height )
-                .attr("y", -50 )
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .text("Milliseconds");
-
             var y = d3.scaleLinear()
                 .domain([
                     d3.min(Object.values(this.history), series => {
@@ -202,6 +188,29 @@ export default {
 
             var yAxis = d3.axisLeft()
                 .scale(y)
+
+            main.append("g")
+                .attr("transform", "translate(0," + this.height + ")")
+                .attr("class", "main axis date")
+                .call(xAxis)
+
+            main.append('line')
+                .style("stroke", "LightGray")
+                .style("fill", "none")
+                .style("shape-rendering", "crispEdges")
+                .style("stroke-dasharray", "0.2em")
+                .attr('x1', x(x.domain()[0]))
+                .attr('y1', y(0))
+                .attr('x2', x(x.domain()[1]))
+                .attr('y2', y(0));
+
+            main.append("text")
+                .attr('transform', 'rotate(-90)')
+                .attr("x", -0.5 * this.height )
+                .attr("y", -50 )
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text("Milliseconds");
 
             main.append("g")
                 .attr("transform", "translate(0,0)")
@@ -381,15 +390,6 @@ export default {
     created: function () {
         this.fetchHistory()
     },
-    mounted: function () {
-
-        //this.drawPlot()
-
-    },
-    updated: function () {
-        console.log("Was I updated?")
-    }
-
 }
 
 </script>
