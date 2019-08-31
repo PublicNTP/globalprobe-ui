@@ -118,15 +118,15 @@ Parameters:
   userpoolClientSetAttributes:
     Type: String
           
-  useDefault:
-    Type: String
-            
   resourceName:
     Type: String
             
   authSelections:
     Type: String
-                                                  
+                                                    
+  useDefault:
+    Type: String
+          
 Conditions:
   ShouldNotCreateEnvResources: !Equals [ !Ref env, NONE ]
 
