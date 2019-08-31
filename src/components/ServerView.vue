@@ -16,6 +16,11 @@
                 </b-table>
             </b-col>
         </b-row>
+        <b-row>
+            <b-col>
+                <h3>Server Alerts</h3>
+            </b-col>
+        </b-row>
     </b-container>
 </template>
 
