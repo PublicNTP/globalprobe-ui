@@ -1,13 +1,12 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <amplify-authenticator></amplify-authenticator>
+    <amplify-sign-out></amplify-sign-out>
   </div>
 </template>
-
 <script>
 import HelloWorld from './components/HelloWorld.vue'
-
+import { Auth } from 'aws-amplify'
 export default {
   name: 'app',
   components: {
@@ -15,7 +14,6 @@ export default {
   }
 }
 </script>
-
 <style>
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
