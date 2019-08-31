@@ -23,7 +23,7 @@
         <b-row>
             <b-col>
                 Monitored NTP Servers
-                <server-table-vue :servers="serversList"/>
+                <server-table-vue v-if="!isFetchingServerList" :servers="serversList"/>
             </b-col>
         </b-row>
     </b-container>
@@ -45,6 +45,7 @@ export default {
             this.$Amplify.API.get("GlobalProbeAPI", "/server/list")
                 .then((data) => {
                     this.servers = data.servers
+                    this.isFetchingServerList = false
                 })
                 .catch((err) => {
                     console.log("Error retrieving servers list")
@@ -56,6 +57,7 @@ export default {
         return {
             addServerUrl: "",
             servers: {},
+            isFetchingServerList: true
         }
     },
 
