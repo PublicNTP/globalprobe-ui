@@ -2,7 +2,24 @@
     <b-container>
         <b-row>
           <b-col>
-            <h3>NTP Time Offset</h3>
+            <h1>Server History</h1>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <span class="font-weight-bold">Server URL</span>: {{ serverUrl }}
+          </b-col>
+        </b-row>
+
+        <b-row>
+          <b-col>
+            <span class="font-weight-bold">Server IP</span>: {{ serverIpAddr }}
+          </b-col>
+        </b-row>
+
+        <b-row>
+          <b-col>
+            <h4>NTP Time Offset</h4>
           </b-col>
         </b-row>
         <b-row>
@@ -18,7 +35,7 @@
         <b-table v-if="!this.isFetchingHistory" :fields="commonTblFields" :items="ntpOffsetTblItems"/>
         <b-row>
             <b-col>
-                <h3>Response Delay</h3>
+                <h4>Response Delay</h4>
                 <div id="latency_plot">
                     <div v-if="this.isFetchingHistory">
                         <b-spinner class="align-middle" />
