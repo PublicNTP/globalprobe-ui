@@ -1,21 +1,21 @@
 <template>
     <b-container>
         <b-row>
+          <b-col>
+            <h3>NTP Time Offset</h3>
+          </b-col>
+        </b-row>
+        <b-row>
             <b-col>
-                <h3>NTP Time Offset</h3>
-                <p v-for="probeSite in probeSiteNames" :key="probeSite">
-                    {{ probeSite }} 
-                    x&#x0304;<!--x "bar" -->= {{ getAvgNtpOffsetMs(probeSite).toFixed(2) }} ms
-                    &#x03C3; = {{ getNtpOffsetDeviation(probeSite).toFixed(2) }} ms
-                </p>
-                <div id="ntp_offset_plot">
-                    <div v-if="this.isFetchingHistory">
-                        <b-spinner class="align-middle" />
-                        <strong>Loading...</strong>
-                    </div>
+            <div id="ntp_offset_plot">
+                <div v-if="this.isFetchingHistory">
+                    <b-spinner class="align-middle" />
+                    <strong>Loading...</strong>
                 </div>
+            </div>
             </b-col>
         </b-row>
+        <b-table v-if="!this.isFetchingHistory" :fields="commonTblFields" :items="ntpOffsetTblItems"/>
         <b-row>
             <b-col>
                 <h3>Response Delay</h3>
@@ -27,6 +27,7 @@
                 </div>
             </b-col>
         </b-row>
+        <b-table v-if="!this.isFetchingHistory" :fields="commonTblFields" :items="responseDelayTblItems"/>
     </b-container>
 </template>
 
@@ -75,7 +76,42 @@ export default {
         },
         probeSiteNames: function () {
             return Object.keys(this.history || {})
+        },
+        commonTblFields: function () {
+            return [
+                {
+                    key: "probeSite",
+                    label: "Probe Site",
+                },
+                {
+                    key: "mean",
+                    label: "Mean (ms)",
+                },
+                {
+                    key: "stddev",
+                    label: "Std. Dev (ms)",
+                }
+              ]
+        },
+        ntpOffsetTblItems: function () {
+            return this.probeSiteNames.map(x => {
+                return {
+                    probeSite: x,
+                    mean: this.getAvgNtpOffsetMs(x).toFixed(2),
+                    stddev: this.getNtpOffsetDeviationMs(x).toFixed(2)
+                }
+            })
+        },
+        responseDelayTblItems: function () {
+            return this.probeSiteNames.map(x => {
+                return {
+                    probeSite: x,
+                    mean: this.getAvgRespDelayMs(x).toFixed(2),
+                    stddev: this.getRespDelayDeviationMs(x).toFixed(2)
+                }
+            })
         }
+
     },
     methods: {
         fetchHistory: function () {
@@ -90,7 +126,7 @@ export default {
                     console.log(data[this.serverUrl][this.serverIpAddr])
                     this.history = this.sanitizeHistoryData(data[this.serverUrl][this.serverIpAddr])
                     this.isFetchingHistory = false
-                    
+
                     this.drawPlot('ntp_offset')
                     this.drawLatencyPlot()
                 })
@@ -145,9 +181,9 @@ export default {
                 .attr("transform", "translate(0," + this.height + ")")
                 .attr("class", "main axis date")
                 .call(xAxis)
-    
+
             main.append("text")
-                .attr('transform', 'rotate(-90)')             
+                .attr('transform', 'rotate(-90)')
                 .attr("x", -0.5 * this.height )
                 .attr("y", -50 )
                 .attr("dy", "1em")
@@ -166,7 +202,7 @@ export default {
 
             var yAxis = d3.axisLeft()
                 .scale(y)
-            
+
             main.append("g")
                 .attr("transform", "translate(0,0)")
                 .attr("class", "main axis date")
@@ -196,7 +232,7 @@ export default {
                 .attr("height", 100)
                 .attr("width", 100)
                 .style("fill", "none")
-                .attr("transform", `translate(${legendX}, ${legendY})`) 
+                .attr("transform", `translate(${legendX}, ${legendY})`)
 
             legend.selectAll("rect")
                 .data(Object.keys(this.history))
@@ -219,7 +255,7 @@ export default {
                 .style("fill", function (d, i) { return color(d)})
                 .style("font", "12px sans-serif")
                 .text(function (d) { return d;})
-                
+
 
         },
         drawLatencyPlot: function () {
@@ -252,9 +288,9 @@ export default {
                 .attr("transform", "translate(0," + this.height + ")")
                 .attr("class", "main axis date")
                 .call(xAxis)
-    
+
             main.append("text")
-                .attr('transform', 'rotate(-90)')             
+                .attr('transform', 'rotate(-90)')
                 .attr("x", -0.5 * this.height )
                 .attr("y", -50 )
                 .attr("dy", "1em")
@@ -263,7 +299,7 @@ export default {
 
             var y = d3.scaleLinear()
                 .domain([
-                    0, 
+                    0,
                     d3.max(Object.values(this.history), series => {
                         return d3.max(series, element => { return element.latency })
                     })
@@ -272,7 +308,7 @@ export default {
 
             var yAxis = d3.axisLeft()
                 .scale(y)
-            
+
             main.append("g")
                 .attr("transform", "translate(0,0)")
                 .attr("class", "main axis date")
@@ -302,7 +338,7 @@ export default {
                 .attr("height", 100)
                 .attr("width", 100)
                 .style("fill", "none")
-                .attr("transform", `translate(${legendX}, ${legendY})`) 
+                .attr("transform", `translate(${legendX}, ${legendY})`)
 
             legend.selectAll("rect")
                 .data(Object.keys(this.history))
@@ -325,15 +361,22 @@ export default {
                 .style("fill", function (d, i) { return color(d)})
                 .style("font", "12px sans-serif")
                 .text(function (d) { return d;})
-                
+
 
         },
         getAvgNtpOffsetMs: function (probeSiteName) {
             return d3.mean(this.history[probeSiteName], d => { return d.ntp_offset})
         },
-        getNtpOffsetDeviation: function (probeSiteName) {
+        getNtpOffsetDeviationMs: function (probeSiteName) {
             return d3.deviation(this.history[probeSiteName], d => { return d.ntp_offset})
+        },
+        getAvgRespDelayMs: function (probeSiteName) {
+            return d3.mean(this.history[probeSiteName], d => { return d.latency})
+        },
+        getRespDelayDeviationMs: function (probeSiteName) {
+            return d3.deviation(this.history[probeSiteName], d => { return d.latency})
         }
+
     },
     created: function () {
         this.fetchHistory()
@@ -341,7 +384,7 @@ export default {
     mounted: function () {
 
         //this.drawPlot()
-    
+
     },
     updated: function () {
         console.log("Was I updated?")
@@ -358,7 +401,7 @@ export default {
     font: 10px sans-serif;
 }
 
-.axis line, .axis path { 
+.axis line, .axis path {
     shape-rendering: crispEdges;
     stroke: black;
     fill: none;
