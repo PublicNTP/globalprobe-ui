@@ -7,7 +7,7 @@
         </b-row>
         <b-row>
           <b-col>
-            <span class="font-weight-bold">Server URL</span>: {{ serverUrl }}
+            <span class="font-weight-bold">Server URL</span>: <router-link :to="{name: 'View-server', params: {serverUrl}}">{{ serverUrl }}</router-link>
           </b-col>
         </b-row>
 
